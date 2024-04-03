@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <h1 class="mb-4">Chatbot</h1>
+        <div id="chatMessages">
+          <!-- Chat messages will be displayed here -->
+        </div>
+        <form id="chatForm" class="mt-4">
+          <div class="input-group">
+            <input type="text" class="form-control" id="userInput" placeholder="Type your message..." required>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    // Function to display chat messages
+    function displayMessage(sender, message) {
+      var chatMessages = document.getElementById('chatMessages');
+      var chatDiv = document.createElement('div');
+      chatDiv.className = 'mt-3 alert alert-primary';
+      chatDiv.innerHTML = `<strong>${sender}: </strong>${message}`;
+      chatMessages.appendChild(chatDiv);
+    }
+
+    // Function to handle form submission
+    function submitForm(event) {
+      event.preventDefault();
+      var userInput = document.getElementById('userInput').value;
+      displayMessage('You', userInput);
+      // Make an AJAX request to the Flask chatbot API to get the chatbot response
+      fetch('/chatbot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_input: userInput }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        displayMessage('Chatbot', data.response);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+      document.getElementById('userInput').value = '';
+    }
+
+    // Attach event listener to the form
+    document.getElementById('chatForm').addEventListener('submit', submitForm);
+  </script>
+</body>
+</html>
